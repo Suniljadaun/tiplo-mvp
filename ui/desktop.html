@@ -5,25 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Tiplo Physio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F1F5F9;
-  --border:#E2E8F0;--border2:#CBD5E1;
-  --teal:#1E6AE1;--teal-light:#EBF3FE;--teal-mid:#3B82F6;
-  --sage:#16A34A;--sage-light:#DCFCE7;
-  --sky:#1E6AE1;--sky-light:#EBF3FE;
-  --text:#0F172A;--text2:#64748B;--text3:#94A3B8;
-  --danger:#EF4444;--success:#22C55E;--accent:#14B8A6;
-  --fh:'Inter',sans-serif;--fb:'Inter',sans-serif;
-  --shadow-sm:0 1px 2px rgba(15,23,42,.05);
-  --shadow-md:0 4px 6px -1px rgba(15,23,42,.05),0 2px 4px -1px rgba(15,23,42,.03);
-  --shadow-lg:0 10px 15px -3px rgba(15,23,42,.05),0 4px 6px -2px rgba(15,23,42,.03);
+  --bg:#F2F4F0;--surface:#FFFFFF;--surface2:#F7F9F7;
+  --border:#E2E8E2;--border2:#D0D8D0;
+  --teal:#1A7A6E;--teal-light:#E8F4F2;--teal-mid:#2E9E8F;
+  --sage:#4A8C6E;--sage-light:#EBF4EE;
+  --sky:#3A7FC1;--sky-light:#EAF2FA;
+  --text:#1E2D2A;--text2:#4A6260;--text3:#8AA8A4;
+  --danger:#C0392B;--success:#2E8B5A;
+  --fh:'Outfit',sans-serif;--fb:'Lato',sans-serif;
+  --shadow-sm:0 1px 4px rgba(30,45,42,.07);
+  --shadow-md:0 4px 16px rgba(30,45,42,.09);
+  --shadow-lg:0 8px 32px rgba(30,45,42,.12);
 }
 html,body{height:100%;width:100%;background:var(--bg);color:var(--text);
   font-family:var(--fb);overflow:hidden;-webkit-font-smoothing:antialiased;
-  font-size:16px;line-height:1.5}
+  font-size:15px;line-height:1.5}
 .screen{position:fixed;inset:0;opacity:0;pointer-events:none;
   transition:opacity .3s ease;display:flex;flex-direction:column}
 .screen.active{opacity:1;pointer-events:all}
@@ -244,6 +244,38 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);
   font-weight:600;letter-spacing:.5px;text-transform:uppercase}
 .hud-switch-bar{height:4px;background:var(--border);border-radius:2px}
 .hud-switch-fill{height:100%;border-radius:2px;transition:width .2s}
+/* Gamification strip */
+.gami-strip {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 8px;
+  flex-shrink: 0;
+  background: var(--surface2);
+}
+.gami-chip {
+  flex: 1; border-radius: 10px; padding: 8px 10px;
+  border: 1px solid var(--border); text-align: center;
+  background: var(--surface);
+}
+.gami-chip .gv {
+  font-family: var(--fh); font-size: 17px; font-weight: 700;
+  display: block; margin-bottom: 2px;
+}
+.gami-chip .gl {
+  font-size: 10px; color: var(--text3); text-transform: uppercase;
+  letter-spacing: 0.5px; display: block;
+}
+.level-up-banner {
+  position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, #F59E0B, #EF4444);
+  color: white; padding: 12px 28px; border-radius: 30px;
+  font-family: var(--fh); font-size: 18px; font-weight: 700;
+  letter-spacing: 1px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 1000;
+}
+.level-up-banner.show { opacity: 1; }
 
 /* ── Screen 4: Summary ── */
 #screen-summary .body{flex:1;display:flex;align-items:center;justify-content:center;padding:32px}
@@ -312,48 +344,48 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);
   </nav>
   <div class="body">
     <div class="page-intro">
-      <h1>Select Your Therapy Plan</h1>
-      <p>Choose an exercise from your plan, or let the clinical assistant automatically track your movement.</p>
+      <h1>Choose Your Exercise</h1>
+      <p>Select an exercise below, or use Auto-Detect to let the camera identify your movement automatically.</p>
     </div>
     <div class="auto-card" onclick="selectEx('auto')">
       <div class="auto-icon">&#127919;</div>
       <div class="auto-text">
-        <h3>Smart Assistant Mode</h3>
-        <p>The system will safely monitor and identify your chosen movements in real time.</p>
+        <h3>Auto-Detect Mode</h3>
+        <p>Camera identifies your exercise automatically based on body position and joint angles</p>
       </div>
       <div class="auto-badge">Recommended</div>
     </div>
-    <div class="ex-section-label">Exercise Library</div>
+    <div class="ex-section-label">Or select a specific exercise</div>
     <div class="ex-grid">
-      <div class="ex-card" style="--c:#1E6AE1;--c-bg:#EBF3FE" onclick="selectEx('squat')">
+      <div class="ex-card" style="--c:#3A7FC1;--c-bg:#EAF2FA" onclick="selectEx('squat')">
         <div class="ex-card-icon">&#11015;</div>
         <div class="ex-card-name">Squat</div>
-        <div class="ex-card-desc">Symmetrical knee flexion, lower hips smoothly below parallel</div>
+        <div class="ex-card-desc">Both knees bend symmetrically, hips lower to parallel</div>
         <div class="ex-card-tag">Lower Body</div>
       </div>
-      <div class="ex-card" style="--c:#14B8A6;--c-bg:#CCFBF1" onclick="selectEx('arm_raise')">
+      <div class="ex-card" style="--c:#7B5EA7;--c-bg:#F3EEFF" onclick="selectEx('arm_raise')">
         <div class="ex-card-icon">&#128588;</div>
         <div class="ex-card-name">Arm Raise</div>
-        <div class="ex-card-desc">Controlled shoulder elevation, raising wrist above shoulder height</div>
+        <div class="ex-card-desc">One or both wrists rise above shoulder height</div>
         <div class="ex-card-tag">Upper Body</div>
       </div>
-      <div class="ex-card" style="--c:#22C55E;--c-bg:#DCFCE7" onclick="selectEx('bird_dog')">
+      <div class="ex-card" style="--c:#1A7A6E;--c-bg:#E8F4F2" onclick="selectEx('bird_dog')">
         <div class="ex-card-icon">&#128038;</div>
         <div class="ex-card-name">Bird Dog</div>
-        <div class="ex-card-desc">Quadruped position - simultaneous opposite limb extension</div>
-        <div class="ex-card-tag">Core Stability</div>
+        <div class="ex-card-desc">On all fours - extend opposite arm and leg</div>
+        <div class="ex-card-tag">Core</div>
       </div>
-      <div class="ex-card" style="--c:#F59E0B;--c-bg:#FEF3C7" onclick="selectEx('deep_lunge')">
+      <div class="ex-card" style="--c:#C0692A;--c-bg:#FFF0E8" onclick="selectEx('deep_lunge')">
         <div class="ex-card-icon">&#129459;</div>
         <div class="ex-card-name">Deep Lunge</div>
-        <div class="ex-card-desc">Forward stride with controlled 90-degree knee flexion</div>
+        <div class="ex-card-desc">Front knee bends to 90 degrees, back knee near floor</div>
         <div class="ex-card-tag">Lower Body</div>
       </div>
-      <div class="ex-card" style="--c:#64748B;--c-bg:#F1F5F9" onclick="selectEx('back_extension')">
+      <div class="ex-card" style="--c:#3D8B5E;--c-bg:#EBF4EE" onclick="selectEx('back_extension')">
         <div class="ex-card-icon">&#128013;</div>
         <div class="ex-card-name">Back Extension</div>
-        <div class="ex-card-desc">Prone position, isolated lumbar extension using back muscles</div>
-        <div class="ex-card-tag">Lumbar Spine</div>
+        <div class="ex-card-desc">Lie face down, lift chest using back muscles</div>
+        <div class="ex-card-tag">Back</div>
       </div>
     </div>
   </div>
@@ -426,7 +458,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);
   </div>
   <div class="hud" id="hud">
     <div class="hud-top">
-      <div class="hud-logo" id="hud-logo">Tiplo Physio</div>
+      <div class="hud-logo">Tiplo Physio</div>
       <button class="btn btn-danger" onclick="endSession()">End Session</button>
     </div>
     <div class="hud-rep-block">
@@ -699,6 +731,19 @@ async function poll(){
       ?entries.map(([n,c])=>{const m=Object.values(EX).find(e=>e.name===n)||{icon:'💪',color:ex.color,bgColor:ex.bgColor};
         return '<div class="break-row"><div class="break-icon" style="background:'+m.bgColor+'">'+m.icon+'</div><span class="break-name">'+n+'</span><span class="break-count" style="color:'+m.color+'">'+c+'<span> reps</span></span></div>';}).join('')
       :'<div class="break-empty">No reps counted yet.<br/>Begin your exercise when ready.</div>';
+    // Gamification
+    if(d.session_score!==undefined){
+      document.getElementById('g-score').textContent=d.session_score;
+      document.getElementById('g-level').textContent=d.level||1;
+      document.getElementById('g-level-name').textContent=(d.level_name||'Beginner').toUpperCase();
+      document.getElementById('g-streak').textContent=d.streak_days||0;
+      if(d.level_up){
+        const banner=document.getElementById('level-up-banner');
+        banner.textContent='🏆 LEVEL '+d.level+' — '+d.level_name+'!';
+        banner.classList.add('show');
+        setTimeout(()=>banner.classList.remove('show'),3000);
+      }
+    }
     const sw=document.getElementById('hud-switch');
     if(d.candidate&&d.candidate!==exName){
       sw.classList.add('show');
@@ -711,8 +756,15 @@ async function poll(){
   }catch(e){}
 }
 
-function endSession(){
+async function endSession(){
   clearInterval(pollTimer);document.getElementById('cam-feed').src='';
+  // Fetch full session data for summary (also saves to data/latest_session.json)
+  let sessionPayload={};
+  try{const r=await fetch('/session_data');if(r.ok)sessionPayload=await r.json();}catch(e){}
+  if(sessionPayload.gamification){const g=sessionPayload.gamification;
+    document.getElementById('g-score').textContent=g.session_score||0;
+    document.getElementById('g-level').textContent=g.level||1;
+    document.getElementById('g-streak').textContent=g.streak_days||0;}
   document.getElementById('sum-total').textContent=lastReps;
   const entries=Object.entries(sessionData);
   document.getElementById('sum-list').innerHTML=entries.length
