@@ -1,0 +1,15 @@
+# Python
+tiplo/
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Model file (too large for git)
+pose_landmarker_lite.task
+
+# VS Code
+.vscode/
+
+# Data
+data/session_log.json

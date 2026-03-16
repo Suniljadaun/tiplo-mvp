@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tiplo Physio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F1F5F9;
+  --border:#E2E8F0;--border2:#CBD5E1;
+  --teal:#1E6AE1;--teal-light:#EBF3FE;--teal-mid:#3B82F6;
+  --sage:#16A34A;--sage-light:#DCFCE7;
+  --sky:#1E6AE1;--sky-light:#EBF3FE;
+  --text:#0F172A;--text2:#64748B;--text3:#94A3B8;
+  --danger:#EF4444;--success:#22C55E;--accent:#14B8A6;
+  --fh:'Inter',sans-serif;--fb:'Inter',sans-serif;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.05);
+  --shadow-md:0 4px 6px -1px rgba(15,23,42,.05),0 2px 4px -1px rgba(15,23,42,.03);
+  --shadow-lg:0 10px 15px -3px rgba(15,23,42,.05),0 4px 6px -2px rgba(15,23,42,.03);
+}
+html,body{height:100%;width:100%;background:var(--bg);color:var(--text);
+  font-family:var(--fb);overflow:hidden;-webkit-font-smoothing:antialiased;
+  font-size:16px;line-height:1.5}
+.screen{position:fixed;inset:0;opacity:0;pointer-events:none;
+  transition:opacity .3s ease;display:flex;flex-direction:column}
+.screen.active{opacity:1;pointer-events:all}
+
+/* Navbar */
+.navbar{background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 40px;height:64px;display:flex;align-items:center;gap:16px;
+  flex-shrink:0;box-shadow:var(--shadow-sm)}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-logo-mark{width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--teal),var(--teal-mid));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fh);font-weight:700;font-size:16px;color:white}
+.nav-logo-text{font-family:var(--fh);font-weight:700;font-size:20px;
+  color:var(--teal);letter-spacing:-.3px}
+.nav-logo-sub{font-size:12px;color:var(--text3);letter-spacing:.5px;
+  text-transform:uppercase;margin-left:2px}
+.nav-spacer{flex:1}
+.nav-privacy{display:flex;align-items:center;gap:7px;
+  background:var(--sage-light);border:1px solid rgba(74,140,110,.2);
+  border-radius:20px;padding:5px 12px;
+  font-size:12px;color:var(--sage);font-family:var(--fh);font-weight:500}
+.nav-privacy-dot{width:7px;height:7px;border-radius:50%;background:var(--success)}
+.back-btn{display:flex;align-items:center;gap:6px;
+  background:none;border:1px solid var(--border2);
+  border-radius:8px;padding:8px 14px;
+  font-family:var(--fh);font-size:14px;font-weight:500;
+  color:var(--text2);cursor:pointer;transition:all .15s}
+.back-btn:hover{background:var(--surface2);color:var(--text)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:none;border-radius:10px;cursor:pointer;
+  font-family:var(--fh);font-weight:600;font-size:15px;
+  transition:all .15s;white-space:nowrap}
+.btn-primary{background:linear-gradient(135deg,var(--teal),var(--teal-mid));
+  color:white;padding:13px 32px;
+  box-shadow:0 2px 8px rgba(26,122,110,.3)}
+.btn-primary:hover{box-shadow:0 4px 16px rgba(26,122,110,.4);transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-ghost{background:var(--surface);color:var(--text2);
+  border:1px solid var(--border2);padding:12px 24px}
+.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+.btn-danger{background:white;color:var(--danger);
+  border:1px solid rgba(192,57,43,.25);padding:10px 20px;font-size:14px}
+.btn-danger:hover{background:#FEF0EE}
+
+/* ── Screen 1: Select ── */
+#screen-select .body{flex:1;overflow-y:auto;padding:32px 40px 40px}
+.page-intro{margin-bottom:28px}
+.page-intro h1{font-family:var(--fh);font-size:26px;font-weight:600;margin-bottom:4px}
+.page-intro p{font-size:14px;color:var(--text2)}
+.auto-card{background:linear-gradient(135deg,var(--teal) 0%,var(--teal-mid) 100%);
+  border-radius:16px;padding:24px 28px;
+  display:flex;align-items:center;gap:20px;
+  cursor:pointer;margin-bottom:20px;
+  box-shadow:0 4px 20px rgba(26,122,110,.25);
+  transition:transform .15s,box-shadow .15s;
+  position:relative;overflow:hidden}
+.auto-card::before{content:'';position:absolute;top:-40px;right:-40px;
+  width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.07)}
+.auto-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(26,122,110,.35)}
+.auto-card:active{transform:translateY(0)}
+.auto-icon{width:52px;height:52px;border-radius:14px;
+  background:rgba(255,255,255,.18);
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;flex-shrink:0}
+.auto-text{flex:1}
+.auto-text h3{font-family:var(--fh);font-size:19px;font-weight:700;color:white;margin-bottom:3px}
+.auto-text p{font-size:13px;color:rgba(255,255,255,.8)}
+.auto-badge{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);
+  border-radius:20px;padding:5px 14px;
+  font-family:var(--fh);font-size:12px;font-weight:600;color:white;letter-spacing:.5px}
+.ex-section-label{font-family:var(--fh);font-size:12px;font-weight:600;
+  color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.ex-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.ex-card{background:var(--surface);border:1.5px solid var(--border);
+  border-radius:14px;padding:20px 16px;
+  cursor:pointer;text-align:left;transition:all .18s;box-shadow:var(--shadow-sm)}
+.ex-card:hover{border-color:var(--c,var(--teal));
+  box-shadow:0 4px 16px rgba(0,0,0,.09),0 0 0 3px rgba(26,122,110,.08);
+  transform:translateY(-2px)}
+.ex-card:active{transform:translateY(0)}
+.ex-card-icon{width:44px;height:44px;border-radius:12px;
+  background:var(--c-bg,var(--teal-light));
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;margin-bottom:14px}
+.ex-card-name{font-family:var(--fh);font-size:15px;font-weight:600;margin-bottom:5px}
+.ex-card-desc{font-size:12px;color:var(--text2);line-height:1.45}
+.ex-card-tag{display:inline-block;margin-top:10px;
+  font-family:var(--fh);font-size:11px;font-weight:600;
+  padding:3px 9px;border-radius:20px;
+  background:var(--c-bg,var(--teal-light));color:var(--c,var(--teal));letter-spacing:.3px}
+
+/* ── Screen 2: Guidance ── */
+#screen-guidance .body{flex:1;display:flex;overflow:hidden}
+.guidance-left{width:380px;flex-shrink:0;background:var(--surface);
+  border-right:1px solid var(--border);padding:32px;
+  display:flex;flex-direction:column;align-items:center;gap:20px}
+.anim-stage{width:260px;height:260px;background:var(--bg);
+  border-radius:20px;border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden}
+.anim-stage::after{content:'';position:absolute;bottom:24px;left:20px;right:20px;
+  height:1.5px;background:var(--border);border-radius:1px}
+.anim-label{font-family:var(--fh);font-size:11px;font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-top:-8px}
+.metrics-row{display:flex;gap:10px;width:100%}
+.metric-chip{flex:1;background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;padding:12px 10px;text-align:center}
+.metric-chip .v{font-family:var(--fh);font-size:17px;font-weight:700;
+  display:block;margin-bottom:3px}
+.metric-chip .l{font-size:10px;color:var(--text3);text-transform:uppercase;
+  letter-spacing:.5px;display:block}
+.guidance-right{flex:1;padding:32px 40px;overflow-y:auto}
+.guidance-right h2{font-family:var(--fh);font-size:24px;font-weight:700;margin-bottom:6px}
+.guidance-right .sub{font-size:14px;color:var(--text2);margin-bottom:28px}
+.info-banner{background:var(--teal-light);border:1px solid rgba(26,122,110,.2);
+  border-radius:10px;padding:12px 16px;
+  font-size:13px;color:var(--teal);margin-bottom:24px;
+  display:flex;gap:10px;align-items:flex-start;line-height:1.5}
+.steps{display:flex;flex-direction:column;gap:0}
+.step-row{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--border)}
+.step-row:last-child{border-bottom:none}
+.step-num{width:30px;height:30px;border-radius:50%;
+  background:var(--c,var(--teal));color:white;
+  font-family:var(--fh);font-size:13px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:2px}
+.step-text{font-size:14px;line-height:1.6;color:var(--text);padding-top:4px}
+.step-text strong{color:var(--c,var(--teal));font-weight:600}
+.guidance-footer{background:var(--surface);border-top:1px solid var(--border);
+  padding:18px 40px;display:flex;align-items:center;gap:20px;flex-shrink:0}
+.guidance-footer .hint{font-size:13px;color:var(--text2);line-height:1.5;flex:1}
+.guidance-footer .hint strong{color:var(--text);font-weight:600}
+
+/* ── Screen 3: Session ── */
+#screen-session{flex-direction:row}
+.cam-panel{flex:1;position:relative;background:#0A0E0D;overflow:hidden}
+.cam-feed{width:100%;height:100%;object-fit:cover;display:block;opacity:.95}
+.cam-overlay{position:absolute;inset:0;pointer-events:none}
+.cam-top-bar{position:absolute;top:0;left:0;right:0;padding:16px 20px;
+  display:flex;align-items:flex-start;justify-content:space-between;
+  background:linear-gradient(to bottom,rgba(10,14,13,.7) 0%,transparent 100%)}
+.cam-ex-badge{background:rgba(255,255,255,.12);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:7px 16px;
+  display:flex;align-items:center;gap:9px}
+.cam-badge-dot{width:8px;height:8px;border-radius:50%;background:#4AE8A0;
+  animation:pulse-cam 2s ease-in-out infinite}
+@keyframes pulse-cam{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.75)}}
+.cam-badge-name{font-family:var(--fh);font-size:14px;font-weight:600;
+  color:white;letter-spacing:.3px}
+.cam-status-strip{position:absolute;bottom:0;left:0;right:0;padding:0 20px 16px;
+  background:linear-gradient(to top,rgba(10,14,13,.75) 0%,transparent 100%)}
+.cam-status-pill{display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.1);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:8px 18px;
+  font-size:13px;color:rgba(255,255,255,.9);transition:all .3s}
+.cam-status-pill.active{background:rgba(26,122,110,.35);border-color:rgba(74,232,160,.4)}
+.cam-status-pill.active .status-dot{background:#4AE8A0}
+.status-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4);transition:background .3s}
+.cam-progress-bar{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.1)}
+.cam-progress-fill{height:100%;width:0%;
+  background:linear-gradient(90deg,var(--teal),#4AE8A0);
+  transition:width .25s ease;border-radius:0 2px 2px 0}
+.rep-flash{position:absolute;inset:0;background:rgba(74,232,160,.12);opacity:0;pointer-events:none}
+.rep-flash.flash{animation:cam-flash .45s ease-out}
+@keyframes cam-flash{0%{opacity:1}100%{opacity:0}}
+.cal-overlay{position:absolute;inset:0;background:rgba(10,14,13,.82);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  transition:opacity .5s}
+.cal-overlay.gone{opacity:0;pointer-events:none}
+.cal-ring{width:52px;height:52px;border:3px solid rgba(255,255,255,.1);
+  border-top-color:#4AE8A0;border-radius:50%;animation:spin 1.1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cal-title{font-family:var(--fh);font-size:18px;font-weight:600;color:white}
+.cal-sub{font-size:13px;color:rgba(255,255,255,.5);text-align:center;max-width:240px}
+
+/* HUD */
+.hud{width:300px;flex-shrink:0;background:var(--surface);
+  border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.hud-top{padding:18px 20px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.hud-logo{font-family:var(--fh);font-size:16px;font-weight:700;color:var(--teal)}
+.hud-rep-block{padding:22px 20px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.hud-rep-label{font-size:11px;font-weight:600;letter-spacing:1px;
+  text-transform:uppercase;color:var(--text3);margin-bottom:4px}
+.hud-rep-number{font-family:var(--fh);font-size:88px;font-weight:700;
+  line-height:.9;color:var(--text)}
+.hud-rep-number.bump{animation:rep-bump .3s ease-out}
+@keyframes rep-bump{0%{transform:scale(1)}40%{transform:scale(1.1)}100%{transform:scale(1)}}
+.hud-rep-exname{font-family:var(--fh);font-size:14px;font-weight:600;
+  color:var(--teal);margin-top:6px}
+.hud-stats{display:grid;grid-template-columns:1fr 1fr;
+  border-bottom:1px solid var(--border);flex-shrink:0}
+.hud-stat{padding:14px 18px;border-right:1px solid var(--border)}
+.hud-stat:nth-child(even){border-right:none}
+.hud-stat .v{font-family:var(--fh);font-size:20px;font-weight:700;
+  color:var(--text);display:block;margin-bottom:2px}
+.hud-stat .v.phase-active{color:var(--teal)}
+.hud-stat .l{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.hud-breakdown{flex:1;overflow-y:auto;padding:14px 20px}
+.hud-breakdown-title{font-size:11px;font-weight:600;letter-spacing:1px;
+  text-transform:uppercase;color:var(--text3);margin-bottom:12px}
+.break-row{display:flex;align-items:center;gap:11px;
+  padding:9px 0;border-bottom:1px solid var(--border)}
+.break-row:last-child{border-bottom:none}
+.break-icon{width:34px;height:34px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;flex-shrink:0;background:var(--teal-light)}
+.break-name{font-family:var(--fh);font-size:14px;font-weight:600;flex:1;color:var(--text)}
+.break-count{font-family:var(--fh);font-size:17px;font-weight:700;color:var(--teal)}
+.break-count span{font-size:11px;color:var(--text3);font-weight:400}
+.break-empty{font-size:13px;color:var(--text3);padding:16px 0;text-align:center;line-height:1.6}
+.hud-switch{padding:10px 20px;border-top:1px solid var(--border);display:none;flex-shrink:0}
+.hud-switch.show{display:block}
+.hud-switch-label{font-size:11px;color:var(--text3);margin-bottom:6px;
+  font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.hud-switch-bar{height:4px;background:var(--border);border-radius:2px}
+.hud-switch-fill{height:100%;border-radius:2px;transition:width .2s}
+
+/* ── Screen 4: Summary ── */
+#screen-summary .body{flex:1;display:flex;align-items:center;justify-content:center;padding:32px}
+.summary-card{background:var(--surface);border:1.5px solid var(--border);
+  border-radius:20px;padding:48px;width:520px;box-shadow:var(--shadow-lg)}
+.summary-card .top{text-align:center;margin-bottom:32px}
+.summary-card .check{width:64px;height:64px;border-radius:50%;
+  background:var(--teal-light);display:flex;align-items:center;justify-content:center;
+  margin:0 auto 16px;font-size:30px}
+.summary-card h2{font-family:var(--fh);font-size:22px;font-weight:600;margin-bottom:4px}
+.summary-card .sub{font-size:14px;color:var(--text2)}
+.summary-total-block{background:var(--teal);border-radius:14px;padding:20px 24px;
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.summary-total-block .num{font-family:var(--fh);font-size:56px;font-weight:700;color:white;line-height:1}
+.summary-total-block .info{text-align:right}
+.summary-total-block .info .label{font-size:12px;color:rgba(255,255,255,.7);
+  text-transform:uppercase;letter-spacing:.5px}
+.summary-total-block .info .unit{font-family:var(--fh);font-size:20px;font-weight:600;
+  color:rgba(255,255,255,.85)}
+.sum-list{margin-bottom:28px}
+.sum-row{display:flex;align-items:center;gap:12px;
+  padding:11px 0;border-bottom:1px solid var(--border)}
+.sum-row:last-child{border-bottom:none}
+.sum-icon{font-size:20px}
+.sum-name{font-family:var(--fh);font-size:15px;font-weight:600;flex:1;color:var(--text)}
+.sum-count{font-family:var(--fh);font-size:18px;font-weight:700;color:var(--teal)}
+.sum-count span{font-size:12px;color:var(--text3);font-weight:400}
+.summary-actions{display:flex;gap:10px}
+
+/* Animations */
+@keyframes sq-body{0%,100%{transform:translateY(0)}50%{transform:translateY(18px)}}
+@keyframes sq-kl{0%,100%{transform:rotate(0)}50%{transform:rotate(36deg)}}
+@keyframes sq-kr{0%,100%{transform:rotate(0)}50%{transform:rotate(-36deg)}}
+.sq-body{animation:sq-body 2.2s ease-in-out infinite;transform-origin:130px 100px}
+.sq-kl{animation:sq-kl 2.2s ease-in-out infinite;transform-origin:110px 150px}
+.sq-kr{animation:sq-kr 2.2s ease-in-out infinite;transform-origin:150px 150px}
+@keyframes ar-l{0%,100%{transform:rotate(0)}50%{transform:rotate(-108deg)}}
+@keyframes ar-r{0%,100%{transform:rotate(0)}50%{transform:rotate(108deg)}}
+.ar-l{animation:ar-l 2.2s ease-in-out infinite;transform-origin:112px 110px}
+.ar-r{animation:ar-r 2.2s ease-in-out infinite;transform-origin:148px 110px}
+@keyframes bd-a{0%,40%,100%{transform:rotate(0)}55%,85%{transform:rotate(-36deg)}}
+@keyframes bd-l{0%,40%,100%{transform:rotate(0)}55%,85%{transform:rotate(28deg)}}
+.bd-a{animation:bd-a 3s ease-in-out infinite;transform-origin:80px 130px}
+.bd-l{animation:bd-l 3s ease-in-out infinite;transform-origin:180px 130px}
+@keyframes ln-d{0%,100%{transform:translateY(0)}50%{transform:translateY(15px)}}
+.ln-d{animation:ln-d 2.5s ease-in-out infinite;transform-origin:130px 110px}
+@keyframes bx-l{0%,100%{transform:rotate(0)}50%{transform:rotate(-16deg)}}
+.bx-l{animation:bx-l 2.5s ease-in-out infinite;transform-origin:170px 140px}
+</style>
+</head>
+<body>
+
+<!-- SCREEN 1 — SELECT -->
+<div id="screen-select" class="screen active">
+  <nav class="navbar">
+    <div class="nav-logo">
+      <div class="nav-logo-mark">T</div>
+      <span class="nav-logo-text">Tiplo</span>
+      <span class="nav-logo-sub">Physio</span>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-privacy">
+      <div class="nav-privacy-dot"></div>
+      Privacy Mode Active
+    </div>
+  </nav>
+  <div class="body">
+    <div class="page-intro">
+      <h1>Select Your Therapy Plan</h1>
+      <p>Choose an exercise from your plan, or let the clinical assistant automatically track your movement.</p>
+    </div>
+    <div class="auto-card" onclick="selectEx('auto')">
+      <div class="auto-icon">&#127919;</div>
+      <div class="auto-text">
+        <h3>Smart Assistant Mode</h3>
+        <p>The system will safely monitor and identify your chosen movements in real time.</p>
+      </div>
+      <div class="auto-badge">Recommended</div>
+    </div>
+    <div class="ex-section-label">Exercise Library</div>
+    <div class="ex-grid">
+      <div class="ex-card" style="--c:#1E6AE1;--c-bg:#EBF3FE" onclick="selectEx('squat')">
+        <div class="ex-card-icon">&#11015;</div>
+        <div class="ex-card-name">Squat</div>
+        <div class="ex-card-desc">Symmetrical knee flexion, lower hips smoothly below parallel</div>
+        <div class="ex-card-tag">Lower Body</div>
+      </div>
+      <div class="ex-card" style="--c:#14B8A6;--c-bg:#CCFBF1" onclick="selectEx('arm_raise')">
+        <div class="ex-card-icon">&#128588;</div>
+        <div class="ex-card-name">Arm Raise</div>
+        <div class="ex-card-desc">Controlled shoulder elevation, raising wrist above shoulder height</div>
+        <div class="ex-card-tag">Upper Body</div>
+      </div>
+      <div class="ex-card" style="--c:#22C55E;--c-bg:#DCFCE7" onclick="selectEx('bird_dog')">
+        <div class="ex-card-icon">&#128038;</div>
+        <div class="ex-card-name">Bird Dog</div>
+        <div class="ex-card-desc">Quadruped position - simultaneous opposite limb extension</div>
+        <div class="ex-card-tag">Core Stability</div>
+      </div>
+      <div class="ex-card" style="--c:#F59E0B;--c-bg:#FEF3C7" onclick="selectEx('deep_lunge')">
+        <div class="ex-card-icon">&#129459;</div>
+        <div class="ex-card-name">Deep Lunge</div>
+        <div class="ex-card-desc">Forward stride with controlled 90-degree knee flexion</div>
+        <div class="ex-card-tag">Lower Body</div>
+      </div>
+      <div class="ex-card" style="--c:#64748B;--c-bg:#F1F5F9" onclick="selectEx('back_extension')">
+        <div class="ex-card-icon">&#128013;</div>
+        <div class="ex-card-name">Back Extension</div>
+        <div class="ex-card-desc">Prone position, isolated lumbar extension using back muscles</div>
+        <div class="ex-card-tag">Lumbar Spine</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2 — GUIDANCE -->
+<div id="screen-guidance" class="screen">
+  <nav class="navbar">
+    <button class="back-btn" onclick="goTo('select')">&#8592; Back</button>
+    <div class="nav-logo">
+      <div class="nav-logo-mark" id="g-logo-mark">T</div>
+      <span class="nav-logo-text">Tiplo</span>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-privacy"><div class="nav-privacy-dot"></div>Privacy Mode Active</div>
+  </nav>
+  <div class="body">
+    <div class="guidance-left">
+      <div class="anim-stage" id="anim-stage"></div>
+      <div class="anim-label" id="anim-label">Movement Preview</div>
+      <div class="metrics-row" id="metrics-row"></div>
+    </div>
+    <div class="guidance-right">
+      <h2 id="g-name">Exercise</h2>
+      <p class="sub" id="g-sub">Follow the steps below to perform this exercise correctly.</p>
+      <div class="info-banner" id="info-banner">
+        <span id="banner-text">Stand 2-3 metres from the camera with your full body visible in frame.</span>
+      </div>
+      <div class="steps" id="steps-list"></div>
+    </div>
+  </div>
+  <div class="guidance-footer">
+    <div class="hint">
+      Position yourself <strong>2-3 metres</strong> from the camera &nbsp;&middot;&nbsp;
+      Ensure <strong>good lighting</strong> &nbsp;&middot;&nbsp;
+      Your <strong>full body</strong> should be visible
+    </div>
+    <button class="btn btn-ghost" onclick="goTo('select')">Change Exercise</button>
+    <button class="btn btn-primary" id="start-btn" onclick="startSession()">Begin Session &#9654;</button>
+  </div>
+</div>
+
+<!-- SCREEN 3 — SESSION -->
+<div id="screen-session" class="screen">
+  <div class="cam-panel">
+    <img class="cam-feed" id="cam-feed" src="" alt=""/>
+    <div class="cam-overlay">
+      <div class="cam-top-bar">
+        <div class="cam-ex-badge">
+          <div class="cam-badge-dot" id="cam-dot"></div>
+          <div class="cam-badge-name" id="cam-badge-name">Detecting...</div>
+        </div>
+      </div>
+      <div class="cam-status-strip">
+        <div class="cam-status-pill" id="cam-status-pill">
+          <span class="status-dot" id="status-dot"></span>
+          <span id="cam-status-text">Calibrating...</span>
+        </div>
+      </div>
+    </div>
+    <div class="rep-flash" id="rep-flash"></div>
+    <div class="cal-overlay" id="cal-overlay">
+      <div class="cal-ring"></div>
+      <div class="cal-title">Calibrating</div>
+      <div class="cal-sub">Stand still with your full body in frame</div>
+    </div>
+    <div class="cam-progress-bar">
+      <div class="cam-progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+  <div class="hud" id="hud">
+    <div class="hud-top">
+      <div class="hud-logo" id="hud-logo">Tiplo Physio</div>
+      <button class="btn btn-danger" onclick="endSession()">End Session</button>
+    </div>
+    <div class="hud-rep-block">
+      <div class="hud-rep-label" id="rep-label">Current Exercise Reps</div>
+      <div class="hud-rep-number" id="rep-number">0</div>
+      <div class="hud-rep-exname" id="rep-exname">&#8212;</div>
+    </div>
+    <div class="hud-stats">
+      <div class="hud-stat"><span class="v" id="stat-total">0</span><span class="l">Session Total</span></div>
+      <div class="hud-stat"><span class="v" id="stat-phase">Rest</span><span class="l">Phase</span></div>
+      <div class="hud-stat"><span class="v" id="stat-orient">&#8212;</span><span class="l">Orientation</span></div>
+      <div class="hud-stat"><span class="v" id="stat-mode">Auto</span><span class="l">Mode</span></div>
+    </div>
+    <div class="hud-breakdown">
+      <div class="hud-breakdown-title">Session Breakdown</div>
+      <div id="breakdown-list"><div class="break-empty">No reps counted yet.<br/>Begin your exercise when ready.</div></div>
+    </div>
+    <div class="hud-switch" id="hud-switch">
+      <div class="hud-switch-label" id="switch-label">Switching exercise...</div>
+      <div class="hud-switch-bar"><div class="hud-switch-fill" id="switch-fill" style="background:var(--teal)"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 4 — SUMMARY -->
+<div id="screen-summary" class="screen">
+  <nav class="navbar">
+    <div class="nav-logo">
+      <div class="nav-logo-mark">T</div>
+      <span class="nav-logo-text">Tiplo</span>
+      <span class="nav-logo-sub">Physio</span>
+    </div>
+  </nav>
+  <div class="body">
+    <div class="summary-card">
+      <div class="top">
+        <div class="check">&#9989;</div>
+        <h2>Session Complete</h2>
+        <p class="sub">Great work! Here is your summary for today's session.</p>
+      </div>
+      <div class="summary-total-block">
+        <div class="num" id="sum-total">0</div>
+        <div class="info">
+          <div class="label">Total</div>
+          <div class="unit">Repetitions</div>
+        </div>
+      </div>
+      <div class="sum-list" id="sum-list"></div>
+      <div class="summary-actions">
+        <button class="btn btn-primary" style="flex:1" onclick="newSession()">Start New Session</button>
+        <button class="btn btn-ghost" onclick="goTo('select')">Change Exercise</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const EX = {
+  auto:{name:'Auto-Detect',sub:'Camera will identify your exercise automatically.',
+    color:'#1A7A6E',bgColor:'#E8F4F2',icon:'🎯',
+    banner:'Stand 2-3 metres from the camera. The system will automatically identify which exercise you begin.',
+    steps:[
+      {t:'Stand <strong>2-3 metres</strong> from the camera with your full body in frame'},
+      {t:'Body orientation is detected first: upright, all-fours, or prone'},
+      {t:'Exercise label <strong>locks in after ~20 frames</strong> of consistent detection'},
+      {t:'Switch exercises naturally - the camera adapts automatically'},
+    ],
+    metrics:[{v:'5',l:'Exercises'},{v:'Auto',l:'Mode'},{v:'0.7s',l:'Lock Time'}],fig:'auto'},
+  squat:{name:'Squat',sub:'Lower body: quadriceps, glutes, hamstrings.',
+    color:'#3A7FC1',bgColor:'#EAF2FA',icon:'⬇️',
+    banner:'Stand with feet shoulder-width apart. The camera tracks knee angle - aim to bend below 130 degrees.',
+    steps:[
+      {t:'Stand with feet <strong>shoulder-width apart</strong>, toes slightly turned out'},
+      {t:'Lower hips until knee angle drops <strong>below 130 degrees</strong>, symmetric on both sides'},
+      {t:'Keep your chest upright and knees tracking over toes throughout'},
+      {t:'Push through your heels to return to <strong>full standing position</strong>'},
+    ],
+    metrics:[{v:'130',l:'Target Angle'},{v:'Sym',l:'Both Knees'},{v:'155',l:'Exit'}],fig:'squat'},
+  arm_raise:{name:'Arm Raise',sub:'Upper body: deltoids, rotator cuff.',
+    color:'#7B5EA7',bgColor:'#F3EEFF',icon:'🙌',
+    banner:'Stand upright. Raise one or both arms - your wrist must clearly exceed shoulder height.',
+    steps:[
+      {t:'Stand upright with core gently engaged, arms at your sides'},
+      {t:'Raise one or both arms - <strong>wrist must clearly exceed shoulder height</strong>'},
+      {t:'Avoid leaning back or shrugging - isolate the shoulder movement'},
+      {t:'Lower your arms <strong>fully back to your sides</strong> to complete the rep'},
+    ],
+    metrics:[{v:'Above',l:'Wrist vs Shoulder'},{v:'L/R',l:'Either Arm'},{v:'0.2s',l:'Hold'}],fig:'arm_raise'},
+  bird_dog:{name:'Bird Dog',sub:'Core stability: erector spinae, glutes.',
+    color:'#1A7A6E',bgColor:'#E8F4F2',icon:'🐦',
+    banner:'Start on hands and knees. Extend the opposite arm and leg simultaneously.',
+    steps:[
+      {t:'Start on <strong>hands and knees</strong>: hands under shoulders, knees under hips'},
+      {t:'Brace your core, then extend <strong>right arm forward and left leg back</strong>'},
+      {t:'Keep hips square - resist rotation and prevent the hip from dropping'},
+      {t:'Return to centre and repeat on the <strong>opposite side</strong> for 1 rep'},
+    ],
+    metrics:[{v:'Opp',l:'Opposite Limbs'},{v:'Level',l:'Hips'},{v:'0.3s',l:'Hold'}],fig:'bird_dog'},
+  deep_lunge:{name:'Deep Lunge',sub:'Lower body: hip flexors, quadriceps.',
+    color:'#C0692A',bgColor:'#FFF0E8',icon:'🦵',
+    banner:'Step forward into a lunge. Front knee must bend past 115 degrees.',
+    steps:[
+      {t:'Stand tall, then <strong>step one foot forward</strong> into a long, controlled stride'},
+      {t:'Lower hips until front knee reaches <strong>below 115 degrees</strong>, back knee near floor'},
+      {t:'The two knees must differ by <strong>30 degrees or more</strong> from each other'},
+      {t:'Drive through the front heel to <strong>return to standing</strong>, then alternate legs'},
+    ],
+    metrics:[{v:'115',l:'Front Knee'},{v:'30+',l:'Min Difference'},{v:'145',l:'Exit'}],fig:'deep_lunge'},
+  back_extension:{name:'Back Extension',sub:'Back: erector spinae, multifidus.',
+    color:'#3D8B5E',bgColor:'#EBF4EE',icon:'🐍',
+    banner:'Lie face down. The camera measures how far your shoulders lift above your hips.',
+    steps:[
+      {t:'Lie <strong>face down</strong> on the floor, forearms resting under your forehead'},
+      {t:'Slowly lift your chest using <strong>back muscles only</strong>, not your arms'},
+      {t:'The sensor measures <strong>shoulder lift above hip level</strong>: threshold is 10%'},
+      {t:'Lower slowly and with <strong>full control</strong>, do not drop suddenly'},
+    ],
+    metrics:[{v:'Prone',l:'Position'},{v:'0.10',l:'Lift Threshold'},{v:'0.3s',l:'Hold'}],fig:'back_extension'},
+};
+
+const FIGS = {
+  squat:c=>`<svg viewBox="0 0 260 260" width="190" height="190">
+    <g class="sq-body">
+      <circle cx="130" cy="55" r="16" fill="${c}"/>
+      <line x1="130" y1="71" x2="130" y2="150" stroke="${c}" stroke-width="4.5" stroke-linecap="round"/>
+      <line x1="130" y1="98" x2="102" y2="128" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+      <line x1="130" y1="98" x2="158" y2="128" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <g class="sq-kl"><line x1="112" y1="150" x2="94" y2="190" stroke="${c}" stroke-width="4.5" stroke-linecap="round"/>
+    <line x1="94" y1="190" x2="78" y2="220" stroke="${c}" stroke-width="3.5" stroke-linecap="round"/></g>
+    <g class="sq-kr"><line x1="148" y1="150" x2="166" y2="190" stroke="${c}" stroke-width="4.5" stroke-linecap="round"/>
+    <line x1="166" y1="190" x2="182" y2="220" stroke="${c}" stroke-width="3.5" stroke-linecap="round"/></g>
+  </svg>`,
+  arm_raise:c=>`<svg viewBox="0 0 260 260" width="190" height="190">
+    <circle cx="130" cy="52" r="16" fill="${c}"/>
+    <line x1="130" y1="68" x2="130" y2="155" stroke="${c}" stroke-width="4.5" stroke-linecap="round"/>
+    <g class="ar-l"><line x1="112" y1="110" x2="82" y2="140" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+    <line x1="82" y1="140" x2="60" y2="158" stroke="${c}" stroke-width="3.5" stroke-linecap="round"/></g>
+    <g class="ar-r"><line x1="148" y1="110" x2="178" y2="140" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+    <line x1="178" y1="140" x2="200" y2="158" stroke="${c}" stroke-width="3.5" stroke-linecap="round"/></g>
+    <line x1="118" y1="155" x2="104" y2="205" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+    <line x1="142" y1="155" x2="156" y2="205" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+    <line x1="104" y1="205" x2="96" y2="232" stroke="${c}" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="156" y1="205" x2="164" y2="232" stroke="${c}" stroke-width="3.5" stroke-linecap="round"/>
+  </svg>`,
+  bird_dog:c=>`<svg viewBox="0 0 260 260" width="190" height="190">
+    <circle cx="130" cy="130" r="14" fill="${c}"/>
+    <line x1="116" y1="130" x2="54" y2="130" stroke="${c}" stroke-width="4.5" stroke-linecap="round"/>
+    <line x1="144" y1="130" x2="206" y2="130" stroke="${c}" stroke-width="4.5" stroke-linecap="round"/>
+    <line x1="76" y1="130" x2="76" y2="172" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+    <line x1="184" y1="130" x2="184" y2="172" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+    <g class="bd-a"><line x1="54" y1="130" x2="14" y2="130" stroke="${c}" stroke-width="4" stroke-linecap="round"/></g>
+    <g class="bd-l"><line x1="206" y1="130" x2="246" y2="130" stroke="${c}" stroke-width="4" stroke-linecap="round"/></g>
+  </svg>`,
+  deep_lunge:c=>`<svg viewBox="0 0 260 260" width="190" height="190">
+    <g class="ln-d">
+      <circle cx="130" cy="50" r="16" fill="${c}"/>
+      <line x1="130" y1="66" x2="130" y2="140" stroke="${c}" stroke-width="4.5" stroke-linecap="round"/>
+      <line x1="130" y1="92" x2="106" y2="120" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+      <line x1="130" y1="92" x2="154" y2="120" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+      <line x1="120" y1="140" x2="90" y2="184" stroke="${c}" stroke-width="4.5" stroke-linecap="round"/>
+      <line x1="90" y1="184" x2="76" y2="218" stroke="${c}" stroke-width="3.5" stroke-linecap="round"/>
+      <line x1="140" y1="140" x2="178" y2="174" stroke="${c}" stroke-width="4.5" stroke-linecap="round"/>
+      <line x1="178" y1="174" x2="194" y2="218" stroke="${c}" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+  </svg>`,
+  back_extension:c=>`<svg viewBox="0 0 260 260" width="190" height="190">
+    <line x1="130" y1="155" x2="224" y2="155" stroke="${c}" stroke-width="4.5" stroke-linecap="round"/>
+    <line x1="196" y1="155" x2="220" y2="174" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+    <line x1="168" y1="155" x2="192" y2="174" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+    <g class="bx-l">
+      <circle cx="64" cy="130" r="14" fill="${c}"/>
+      <line x1="78" y1="137" x2="130" y2="155" stroke="${c}" stroke-width="4.5" stroke-linecap="round"/>
+      <line x1="90" y1="141" x2="72" y2="168" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+      <line x1="108" y1="147" x2="90" y2="170" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+    </g>
+  </svg>`,
+  auto:c=>`<svg viewBox="0 0 260 260" width="190" height="190">
+    <circle cx="130" cy="52" r="16" fill="${c}" opacity="0.9"/>
+    <line x1="130" y1="68" x2="130" y2="152" stroke="${c}" stroke-width="4.5" stroke-linecap="round" opacity="0.9"/>
+    <line x1="130" y1="96" x2="102" y2="126" stroke="${c}" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+    <line x1="130" y1="96" x2="158" y2="126" stroke="${c}" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+    <line x1="118" y1="152" x2="104" y2="202" stroke="${c}" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+    <line x1="142" y1="152" x2="156" y2="202" stroke="${c}" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+    <circle cx="130" cy="52" r="28" stroke="${c}" stroke-width="1.5" fill="none" opacity="0.2" stroke-dasharray="5 4">
+      <animateTransform attributeName="transform" type="rotate" from="0 130 52" to="360 130 52" dur="3s" repeatCount="indefinite"/>
+    </circle>
+  </svg>`,
+};
+
+let currentEx='auto',pollTimer=null,lastReps=0,lastExReps={},sessionData={},calibrated=false;
+
+function goTo(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active')}
+
+function selectEx(key){
+  currentEx=key;const ex=EX[key];
+  document.getElementById('g-name').textContent=ex.name;
+  document.getElementById('g-sub').textContent=ex.sub;
+  document.getElementById('banner-text').textContent=ex.banner;
+  document.getElementById('anim-label').textContent=ex.name+' - Movement Preview';
+  const lm=document.getElementById('g-logo-mark');
+  lm.style.background='linear-gradient(135deg,'+ex.color+','+ex.color+'CC)';
+  const bn=document.getElementById('info-banner');
+  bn.style.background=ex.bgColor;bn.style.borderColor=ex.color+'33';bn.style.color=ex.color;
+  document.getElementById('anim-stage').innerHTML=FIGS[ex.fig](ex.color);
+  document.getElementById('metrics-row').innerHTML=ex.metrics.map(m=>
+    '<div class="metric-chip" style="border-top:3px solid '+ex.color+'"><span class="v" style="color:'+ex.color+'">'+m.v+'</span><span class="l">'+m.l+'</span></div>').join('');
+  document.getElementById('steps-list').innerHTML=ex.steps.map((s,i)=>
+    '<div class="step-row"><div class="step-num" style="background:'+ex.color+'">'+(i+1)+'</div><div class="step-text" style="--c:'+ex.color+'">'+s.t+'</div></div>').join('');
+  const btn=document.getElementById('start-btn');
+  btn.style.background='linear-gradient(135deg,'+ex.color+','+ex.color+'CC)';
+  goTo('guidance');
+}
+
+async function startSession(){
+  calibrated=false;lastReps=0;lastExReps={};sessionData={};
+  const ex=EX[currentEx];
+  document.getElementById('cam-badge-name').textContent=ex.name;
+  document.getElementById('stat-mode').textContent=currentEx==='auto'?'Auto':'Locked';
+  document.getElementById('rep-exname').style.color=ex.color;
+  document.getElementById('hud-logo').style.color=ex.color;
+  ['rep-number','stat-total'].forEach(id=>document.getElementById(id).textContent='0');
+  document.getElementById('rep-exname').textContent='—';
+  document.getElementById('stat-phase').textContent='Rest';
+  document.getElementById('stat-orient').textContent='—';
+  document.getElementById('progress-fill').style.width='0%';
+  document.getElementById('cam-status-text').textContent='Calibrating...';
+  document.getElementById('cam-status-pill').classList.remove('active');
+  document.getElementById('cal-overlay').classList.remove('gone');
+  document.getElementById('hud-switch').classList.remove('show');
+  document.getElementById('breakdown-list').innerHTML='<div class="break-empty">No reps counted yet.<br/>Begin your exercise when ready.</div>';
+  await fetch('/reset').catch(()=>{});
+  const param=currentEx==='auto'?'':currentEx;
+  document.getElementById('cam-feed').src='/video?exercise='+param+'&t='+Date.now();
+  goTo('session');
+  if(pollTimer)clearInterval(pollTimer);
+  pollTimer=setInterval(poll,350);
+}
+
+async function poll(){
+  try{
+    const r=await fetch('/state');if(!r.ok)return;
+    const d=await r.json();const ex=EX[currentEx];
+    if(d.calibrated&&!calibrated){calibrated=true;document.getElementById('cal-overlay').classList.add('gone')}
+    const exName=d.exercise||'—';
+    document.getElementById('cam-badge-name').textContent=exName;
+    document.getElementById('rep-exname').textContent=exName!=='Detecting...'?exName:'—';
+    document.getElementById('rep-label').textContent=exName!=='Detecting...'?exName+' Reps':'Current Reps';
+    const phase=d.phase||'rest';
+    const sp=document.getElementById('cam-status-pill');
+    document.getElementById('cam-status-text').textContent=d.status||'';
+    phase==='active'?sp.classList.add('active'):sp.classList.remove('active');
+    document.getElementById('stat-total').textContent=d.reps||0;
+    const phEl=document.getElementById('stat-phase');
+    phEl.textContent=phase==='active'?'Active':'Rest';
+    phEl.className='v'+(phase==='active'?' phase-active':'');
+    const ori=(d.orientation||'—');
+    document.getElementById('stat-orient').textContent=ori==='unknown'?'—':ori.replace('_','-').replace(/\b\w/g,c=>c.toUpperCase());
+    document.getElementById('progress-fill').style.width=((d.progress||0)*100)+'%';
+    const exReps=d.exercise_reps||{};sessionData=exReps;
+    const exCount=exReps[exName]||0;
+    if((lastExReps[exName]||0)!==exCount&&exCount>0){
+      const fl=document.getElementById('rep-flash');fl.classList.remove('flash');void fl.offsetWidth;fl.classList.add('flash');
+      const num=document.getElementById('rep-number');num.classList.remove('bump');void num.offsetWidth;num.classList.add('bump');
+    }
+    document.getElementById('rep-number').textContent=exCount;
+    lastReps=d.reps||0;lastExReps={...exReps};
+    const entries=Object.entries(exReps);
+    document.getElementById('breakdown-list').innerHTML=entries.length
+      ?entries.map(([n,c])=>{const m=Object.values(EX).find(e=>e.name===n)||{icon:'💪',color:ex.color,bgColor:ex.bgColor};
+        return '<div class="break-row"><div class="break-icon" style="background:'+m.bgColor+'">'+m.icon+'</div><span class="break-name">'+n+'</span><span class="break-count" style="color:'+m.color+'">'+c+'<span> reps</span></span></div>';}).join('')
+      :'<div class="break-empty">No reps counted yet.<br/>Begin your exercise when ready.</div>';
+    const sw=document.getElementById('hud-switch');
+    if(d.candidate&&d.candidate!==exName){
+      sw.classList.add('show');
+      document.getElementById('switch-label').textContent='Switching to '+d.candidate+'...';
+      const pct=Math.min(((d.candidate_frames||0)/20)*100,100);
+      const m=Object.values(EX).find(e=>e.name===d.candidate)||{color:ex.color};
+      document.getElementById('switch-fill').style.width=pct+'%';
+      document.getElementById('switch-fill').style.background=m.color;
+    }else{sw.classList.remove('show')}
+  }catch(e){}
+}
+
+function endSession(){
+  clearInterval(pollTimer);document.getElementById('cam-feed').src='';
+  document.getElementById('sum-total').textContent=lastReps;
+  const entries=Object.entries(sessionData);
+  document.getElementById('sum-list').innerHTML=entries.length
+    ?entries.map(([n,c])=>{const m=Object.values(EX).find(e=>e.name===n)||{icon:'💪',color:'#1A7A6E'};
+      return '<div class="sum-row"><span class="sum-icon">'+m.icon+'</span><span class="sum-name">'+n+'</span><span class="sum-count" style="color:'+m.color+'">'+c+'<span> reps</span></span></div>';}).join('')
+    :'<p style="color:var(--text3);font-size:14px;text-align:center;padding:16px 0">No reps recorded this session.</p>';
+  goTo('summary');
+}
+function newSession(){fetch('/reset').catch(()=>{});goTo('select')}
+</script>
+</body>
+</html>

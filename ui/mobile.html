@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#060A0F"/>
+<title>Tiplo Physio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+<style>
+  /* ── Reset & Base ──────────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg:        #060A0F;
+    --bg2:       #0D1420;
+    --bg3:       #131C2A;
+    --teal:      #00E5CC;
+    --teal-dim:  #00B3A0;
+    --amber:     #FF8C42;
+    --red:       #FF4466;
+    --white:     #E8F0F8;
+    --grey:      #4A5568;
+    --grey2:     #2D3748;
+    --font-head: 'Rajdhani', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  html, body {
+    height: 100%; width: 100%;
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font-body);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Screen System ─────────────────────────────────────────────────────── */
+  .screen {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    opacity: 0; pointer-events: none;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .screen.active {
+    opacity: 1; pointer-events: all;
+    transform: translateY(0);
+  }
+  .screen.exit {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+  }
+
+  /* ── Top Bar ───────────────────────────────────────────────────────────── */
+  .topbar {
+    display: flex; align-items: center;
+    padding: 16px 20px 12px;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .logo {
+    font-family: var(--font-head);
+    font-size: 22px; font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--teal);
+  }
+  .logo span { color: var(--white); opacity: 0.4; }
+  .back-btn {
+    background: none; border: none;
+    color: var(--grey); font-size: 22px;
+    cursor: pointer; padding: 4px 8px 4px 0;
+    margin-right: 8px;
+    color: var(--teal);
+  }
+
+  /* ── Typography ────────────────────────────────────────────────────────── */
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: 2px;
+    color: var(--grey); text-transform: uppercase;
+    padding: 0 20px; margin-bottom: 12px;
+  }
+  h2 {
+    font-family: var(--font-head);
+    font-size: 28px; font-weight: 600;
+    letter-spacing: 1px; line-height: 1.1;
+  }
+  h3 {
+    font-family: var(--font-head);
+    font-size: 20px; font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Buttons ───────────────────────────────────────────────────────────── */
+  .btn {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    padding: 16px 28px;
+    border: none; border-radius: 12px;
+    font-family: var(--font-head);
+    font-size: 18px; font-weight: 600; letter-spacing: 1px;
+    cursor: pointer;
+    transition: transform 0.12s, opacity 0.12s;
+    min-height: 54px;
+    text-transform: uppercase;
+  }
+  .btn:active { transform: scale(0.97); opacity: 0.9; }
+  .btn-primary {
+    background: var(--teal);
+    color: var(--bg);
+    width: 100%;
+  }
+  .btn-secondary {
+    background: var(--bg3);
+    color: var(--white);
+    border: 1px solid var(--grey2);
+    width: 100%;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--grey);
+    border: 1px solid var(--grey2);
+    font-size: 15px;
+    padding: 12px 20px;
+    min-height: 44px;
+  }
+
+  /* ── Divider ───────────────────────────────────────────────────────────── */
+  .divider {
+    height: 1px; background: var(--grey2);
+    margin: 8px 20px;
+    flex-shrink: 0;
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     SCREEN 1 — HOME / EXERCISE SELECT
+  ══════════════════════════════════════════════════════════════════════════ */
+  #screen-home .topbar { padding-bottom: 0; }
+  #screen-home .hero {
+    padding: 24px 20px 20px;
+    flex-shrink: 0;
+  }
+  #screen-home .hero p {
+    color: var(--grey);
+    font-size: 14px; margin-top: 4px;
+    font-family: var(--font-body);
+  }
+
+  .exercise-list {
+    padding: 4px 16px 24px;
+    display: flex; flex-direction: column; gap: 10px;
+    flex: 1;
+  }
+
+  .exercise-card {
+    background: var(--bg2);
+    border: 1px solid var(--bg3);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex; align-items: center; gap: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.12s;
+    position: relative;
+    overflow: hidden;
+    min-height: 78px;
+  }
+  .exercise-card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--card-color, var(--teal));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .exercise-card:active { transform: scale(0.98); }
+  .exercise-card:active::before { opacity: 1; }
+
+  .ex-icon {
+    font-size: 30px;
+    width: 50px; height: 50px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg3); border-radius: 12px;
+    flex-shrink: 0;
+  }
+  .ex-info { flex: 1; }
+  .ex-info h3 {
+    font-size: 17px;
+    color: var(--white);
+  }
+  .ex-info p {
+    font-size: 12px; color: var(--grey);
+    margin-top: 2px; line-height: 1.4;
+  }
+  .ex-tag {
+    font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: 1px;
+    padding: 3px 8px; border-radius: 20px;
+    background: var(--bg3);
+    color: var(--card-color, var(--teal));
+    flex-shrink: 0;
+  }
+
+  .auto-card {
+    background: linear-gradient(135deg, rgba(0,229,204,0.08), rgba(0,229,204,0.03));
+    border-color: rgba(0,229,204,0.25);
+  }
+  .auto-card::before { opacity: 1; }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     SCREEN 2 — GUIDANCE
+  ══════════════════════════════════════════════════════════════════════════ */
+  #screen-guidance {
+    background: var(--bg);
+  }
+  #screen-guidance .topbar {
+    border-bottom: 1px solid var(--bg3);
+    flex-shrink: 0;
+  }
+
+  .guidance-exercise-name {
+    font-family: var(--font-head);
+    font-size: 26px; font-weight: 700;
+    letter-spacing: 1px;
+    flex: 1;
+  }
+
+  /* Animation Stage */
+  .anim-stage {
+    background: var(--bg2);
+    margin: 16px 20px;
+    border-radius: 20px;
+    height: 220px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--bg3);
+    flex-shrink: 0;
+  }
+  .anim-stage::after {
+    content: '';
+    position: absolute; bottom: 0; left: 10%; right: 10%;
+    height: 2px;
+    background: var(--card-color, var(--teal));
+    opacity: 0.3;
+    border-radius: 1px;
+  }
+
+  /* SVG stick figures */
+  .figure-svg {
+    width: 180px; height: 200px;
+  }
+  .fig-stroke { stroke: var(--card-color, var(--teal)); stroke-linecap: round; stroke-linejoin: round; fill: none; }
+  .fig-head { fill: var(--card-color, var(--teal)); stroke: none; }
+  .fig-ghost { stroke: rgba(255,255,255,0.08); }
+
+  /* ── Squat animation ── */
+  @keyframes squat-body {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(22px); }
+  }
+  @keyframes squat-knee-l {
+    0%, 100% { transform: rotate(0deg); }
+    50%       { transform: rotate(40deg); }
+  }
+  @keyframes squat-knee-r {
+    0%, 100% { transform: rotate(0deg); }
+    50%       { transform: rotate(-40deg); }
+  }
+  .squat-torso { animation: squat-body 2s ease-in-out infinite; transform-origin: 90px 80px; }
+  .squat-leg-l { animation: squat-knee-l 2s ease-in-out infinite; transform-origin: 72px 130px; }
+  .squat-leg-r { animation: squat-knee-r 2s ease-in-out infinite; transform-origin: 108px 130px; }
+
+  /* ── Arm Raise animation ── */
+  @keyframes arm-raise-l {
+    0%, 100% { transform: rotate(0deg); }
+    50%       { transform: rotate(-120deg); }
+  }
+  @keyframes arm-raise-r {
+    0%, 100% { transform: rotate(0deg); }
+    50%       { transform: rotate(120deg); }
+  }
+  .arm-l { animation: arm-raise-l 2s ease-in-out infinite; transform-origin: 75px 90px; }
+  .arm-r { animation: arm-raise-r 2s ease-in-out infinite; transform-origin: 105px 90px; }
+
+  /* ── Bird Dog animation ── */
+  @keyframes bird-arm {
+    0%, 40%, 100% { transform: rotate(0deg); }
+    50%, 90%      { transform: rotate(-40deg); }
+  }
+  @keyframes bird-leg {
+    0%, 40%, 100% { transform: rotate(0deg); }
+    50%, 90%      { transform: rotate(30deg); }
+  }
+  .bird-arm-ext { animation: bird-arm 3s ease-in-out infinite; transform-origin: 60px 100px; }
+  .bird-leg-ext { animation: bird-leg 3s ease-in-out infinite; transform-origin: 120px 110px; }
+
+  /* ── Lunge animation ── */
+  @keyframes lunge-drop {
+    0%, 100% { transform: translateY(0) scaleY(1); }
+    50%       { transform: translateY(18px) scaleY(0.92); }
+  }
+  .lunge-body { animation: lunge-drop 2.5s ease-in-out infinite; transform-origin: 90px 90px; }
+
+  /* ── Back Extension animation ── */
+  @keyframes back-lift {
+    0%, 100% { transform: rotate(0deg); }
+    50%       { transform: rotate(-20deg); }
+  }
+  .back-upper { animation: back-lift 2.5s ease-in-out infinite; transform-origin: 120px 100px; }
+
+  /* Steps */
+  .guidance-steps {
+    padding: 0 20px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  .step {
+    display: flex; gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--bg3);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--card-color, var(--teal));
+    color: var(--bg);
+    font-family: var(--font-mono);
+    font-size: 13px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-text { font-size: 14px; color: var(--white); line-height: 1.5; }
+  .step-text strong { color: var(--card-color, var(--teal)); }
+
+  .metric-row {
+    display: flex; gap: 10px;
+    padding: 14px 20px;
+    flex-shrink: 0;
+  }
+  .metric-chip {
+    flex: 1;
+    background: var(--bg2);
+    border: 1px solid var(--bg3);
+    border-radius: 10px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .metric-chip .val {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    color: var(--card-color, var(--teal));
+    display: block;
+  }
+  .metric-chip .lbl {
+    font-size: 10px; color: var(--grey);
+    letter-spacing: 1px; text-transform: uppercase;
+    margin-top: 2px;
+    display: block;
+  }
+
+  .guidance-footer {
+    padding: 12px 20px 28px;
+    flex-shrink: 0;
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     SCREEN 3 — CAMERA
+  ══════════════════════════════════════════════════════════════════════════ */
+  #screen-camera {
+    background: #000;
+    overflow: hidden;
+  }
+
+  /* Full screen video */
+  .camera-feed {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Overlay layers on top of video */
+  .cam-overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    pointer-events: none;
+  }
+
+  /* Top chrome */
+  .cam-top {
+    padding: env(safe-area-inset-top, 16px) 16px 0;
+    padding-top: max(env(safe-area-inset-top), 16px);
+    display: flex; align-items: flex-start;
+    justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(6,10,15,0.85) 0%, transparent 100%);
+    padding-bottom: 40px;
+    pointer-events: all;
+  }
+
+  .cam-exercise-badge {
+    background: rgba(6,10,15,0.7);
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    padding: 6px 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .cam-exercise-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--teal);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(0.7); }
+  }
+  .cam-exercise-name {
+    font-family: var(--font-head);
+    font-size: 15px; font-weight: 600; letter-spacing: 1px;
+    color: var(--white);
+  }
+
+  .cam-done-btn {
+    background: rgba(6,10,15,0.7);
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-family: var(--font-head);
+    font-size: 14px; font-weight: 600; letter-spacing: 1px;
+    color: var(--grey);
+    cursor: pointer;
+    pointer-events: all;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .cam-done-btn:active { color: var(--red); }
+
+  /* Middle status */
+  .cam-middle {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 8px;
+  }
+
+  .cam-status-pill {
+    background: rgba(6,10,15,0.75);
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(8px);
+    border-radius: 30px;
+    padding: 8px 20px;
+    font-family: var(--font-body);
+    font-size: 14px; color: var(--white);
+    max-width: 80vw; text-align: center;
+    transition: all 0.3s;
+  }
+  .cam-phase-active .cam-status-pill {
+    border-color: rgba(0,229,204,0.4);
+    background: rgba(0,229,204,0.12);
+  }
+
+  /* Calibration overlay */
+  .calibrating-overlay {
+    position: absolute; inset: 0;
+    background: rgba(6,10,15,0.75);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px;
+    transition: opacity 0.5s;
+  }
+  .calibrating-overlay.hidden { opacity: 0; pointer-events: none; }
+  .cal-spinner {
+    width: 48px; height: 48px;
+    border: 3px solid var(--bg3);
+    border-top-color: var(--teal);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .cal-text {
+    font-family: var(--font-head);
+    font-size: 18px; font-weight: 600;
+    letter-spacing: 1px; color: var(--white);
+  }
+  .cal-sub { font-size: 13px; color: var(--grey); text-align: center; max-width: 240px; }
+
+  /* Bottom rep counter */
+  .cam-bottom {
+    background: linear-gradient(to top, rgba(6,10,15,0.92) 0%, transparent 100%);
+    padding: 40px 20px 28px;
+    padding-bottom: max(28px, env(safe-area-inset-bottom));
+    display: flex; align-items: flex-end; gap: 12px;
+  }
+
+  /* Big rep counter */
+  .rep-display {
+    flex: 1;
+  }
+  .rep-label {
+    font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: 2px;
+    color: var(--grey); text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .rep-number {
+    font-family: var(--font-head);
+    font-size: 72px; font-weight: 700;
+    line-height: 1;
+    color: var(--white);
+    transition: transform 0.1s;
+  }
+  .rep-number.bump {
+    animation: rep-bump 0.3s ease-out;
+  }
+  @keyframes rep-bump {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+  .rep-exercise {
+    font-family: var(--font-head);
+    font-size: 14px; font-weight: 600; letter-spacing: 1px;
+    color: var(--teal);
+    margin-top: -2px;
+    transition: color 0.3s;
+  }
+
+  /* Side stats */
+  .cam-stats {
+    display: flex; flex-direction: column; gap: 8px;
+    align-items: flex-end;
+    padding-bottom: 8px;
+  }
+  .stat-chip {
+    background: rgba(13,20,32,0.8);
+    border: 1px solid var(--bg3);
+    backdrop-filter: blur(8px);
+    border-radius: 10px;
+    padding: 8px 12px;
+    text-align: right;
+  }
+  .stat-val {
+    font-family: var(--font-mono);
+    font-size: 18px; font-weight: 500;
+    color: var(--white);
+    display: block;
+  }
+  .stat-lbl {
+    font-size: 10px; color: var(--grey);
+    letter-spacing: 1px; text-transform: uppercase;
+    display: block; margin-top: 1px;
+  }
+
+  /* Progress bar */
+  .cam-progress {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--bg3);
+  }
+  .cam-progress-fill {
+    height: 100%;
+    background: var(--teal);
+    width: 0%;
+    transition: width 0.2s ease;
+  }
+
+  /* Rep flash */
+  .rep-flash {
+    position: absolute; inset: 0;
+    background: rgba(0,229,204,0.12);
+    pointer-events: none;
+    opacity: 0;
+  }
+  .rep-flash.flash {
+    animation: flash-anim 0.4s ease-out;
+  }
+  @keyframes flash-anim {
+    0%   { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     SCREEN 4 — SESSION SUMMARY
+  ══════════════════════════════════════════════════════════════════════════ */
+  #screen-summary {
+    overflow-y: auto;
+  }
+  .summary-hero {
+    padding: 40px 20px 24px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .summary-emoji { font-size: 48px; margin-bottom: 12px; display: block; }
+  .summary-total {
+    font-family: var(--font-head);
+    font-size: 64px; font-weight: 700;
+    color: var(--teal);
+    line-height: 1;
+    display: block;
+  }
+  .summary-total-label {
+    font-family: var(--font-mono);
+    font-size: 12px; letter-spacing: 2px;
+    color: var(--grey); text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .summary-breakdown {
+    padding: 8px 20px;
+  }
+  .summary-row {
+    display: flex; align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--bg3);
+    gap: 12px;
+  }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row .icon {
+    font-size: 22px; width: 40px; height: 40px;
+    background: var(--bg2); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .summary-row .name {
+    font-family: var(--font-head);
+    font-size: 17px; font-weight: 600; flex: 1;
+  }
+  .summary-row .count {
+    font-family: var(--font-mono);
+    font-size: 22px; color: var(--teal);
+    font-weight: 500;
+  }
+  .summary-row .count span {
+    font-size: 12px; color: var(--grey);
+    margin-left: 3px;
+  }
+
+  .summary-footer {
+    padding: 20px 20px 40px;
+    display: flex; flex-direction: column; gap: 10px;
+    flex-shrink: 0;
+  }
+
+  /* ── Misc ──────────────────────────────────────────────────────────────── */
+  .privacy-tag {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: 1px;
+    color: var(--grey);
+    justify-content: center;
+    padding: 12px 0;
+  }
+  .privacy-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #2ECC71;
+  }
+
+  .error-msg {
+    background: rgba(255,68,102,0.1);
+    border: 1px solid rgba(255,68,102,0.3);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 13px; color: var(--red);
+    margin: 12px 20px;
+    text-align: center;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN 1 — HOME
+════════════════════════════════════════════════════ -->
+<div id="screen-home" class="screen active">
+  <div class="topbar">
+    <div class="logo">TIPLO <span>PHYSIO</span></div>
+  </div>
+
+  <div class="hero">
+    <h2>Choose an Exercise</h2>
+    <p>Select below or let the camera detect automatically</p>
+  </div>
+
+  <div class="exercise-list">
+
+    <div class="exercise-card auto-card" onclick="selectExercise('auto')"
+         style="--card-color: var(--teal)">
+      <div class="ex-icon">🎯</div>
+      <div class="ex-info">
+        <h3>Auto-Detect</h3>
+        <p>Camera recognises your exercise automatically</p>
+      </div>
+      <div class="ex-tag">AUTO</div>
+    </div>
+
+    <div class="exercise-card" onclick="selectExercise('squat')"
+         style="--card-color: #00C8FF">
+      <div class="ex-icon">⬇️</div>
+      <div class="ex-info">
+        <h3>Squat</h3>
+        <p>Bend both knees, hips below parallel</p>
+      </div>
+      <div class="ex-tag" style="color:#00C8FF">LOWER BODY</div>
+    </div>
+
+    <div class="exercise-card" onclick="selectExercise('arm_raise')"
+         style="--card-color: #B450FF">
+      <div class="ex-icon">🙌</div>
+      <div class="ex-info">
+        <h3>Arm Raise</h3>
+        <p>Raise one or both arms above shoulder height</p>
+      </div>
+      <div class="ex-tag" style="color:#B450FF">UPPER BODY</div>
+    </div>
+
+    <div class="exercise-card" onclick="selectExercise('bird_dog')"
+         style="--card-color: #00E5CC">
+      <div class="ex-icon">🐦</div>
+      <div class="ex-info">
+        <h3>Bird Dog</h3>
+        <p>On all fours — extend opposite arm and leg</p>
+      </div>
+      <div class="ex-tag">CORE</div>
+    </div>
+
+    <div class="exercise-card" onclick="selectExercise('deep_lunge')"
+         style="--card-color: #FF8C42">
+      <div class="ex-icon">🦵</div>
+      <div class="ex-info">
+        <h3>Deep Lunge</h3>
+        <p>Step forward, front knee to 90°, hips low</p>
+      </div>
+      <div class="ex-tag" style="color:#FF8C42">LOWER BODY</div>
+    </div>
+
+    <div class="exercise-card" onclick="selectExercise('back_extension')"
+         style="--card-color: #8CDC00">
+      <div class="ex-icon">🐍</div>
+      <div class="ex-info">
+        <h3>Back Extension</h3>
+        <p>Lie face down, lift chest using back muscles</p>
+      </div>
+      <div class="ex-tag" style="color:#8CDC00">BACK</div>
+    </div>
+
+  </div>
+
+  <div class="privacy-tag">
+    <div class="privacy-dot"></div>
+    Privacy mode — silhouette only, no video stored
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN 2 — GUIDANCE
+════════════════════════════════════════════════════ -->
+<div id="screen-guidance" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="goTo('home')">←</button>
+    <div class="guidance-exercise-name" id="guidance-title">Squat</div>
+  </div>
+
+  <!-- Animation Stage -->
+  <div class="anim-stage" id="anim-stage">
+    <!-- injected by JS -->
+  </div>
+
+  <!-- Metric chips -->
+  <div class="metric-row" id="metric-row">
+    <!-- injected by JS -->
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Steps -->
+  <div class="guidance-steps" id="guidance-steps">
+    <!-- injected by JS -->
+  </div>
+
+  <div class="guidance-footer">
+    <button class="btn btn-primary" id="start-btn" onclick="startCamera()">
+      Start Camera  →
+    </button>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN 3 — CAMERA
+════════════════════════════════════════════════════ -->
+<div id="screen-camera" class="screen" id="cam-phase-rest">
+
+  <!-- MJPEG stream -->
+  <img class="camera-feed" id="camera-feed" src="" alt="camera"/>
+
+  <!-- Rep flash -->
+  <div class="rep-flash" id="rep-flash"></div>
+
+  <!-- Overlay -->
+  <div class="cam-overlay" id="cam-overlay">
+
+    <div class="cam-top">
+      <div class="cam-exercise-badge">
+        <div class="cam-exercise-dot" id="cam-dot"></div>
+        <div class="cam-exercise-name" id="cam-exercise-name">Detecting...</div>
+      </div>
+      <button class="cam-done-btn" onclick="endSession()">Done</button>
+    </div>
+
+    <div class="cam-middle">
+      <div class="cam-status-pill" id="cam-status">Calibrating...</div>
+    </div>
+
+    <div class="cam-bottom">
+      <div class="rep-display">
+        <div class="rep-label" id="rep-label">REPS</div>
+        <div class="rep-number" id="rep-number">0</div>
+        <div class="rep-exercise" id="rep-exercise-label">—</div>
+      </div>
+      <div class="cam-stats">
+        <div class="stat-chip">
+          <span class="stat-val" id="total-reps">0</span>
+          <span class="stat-lbl">Total</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-val" id="cam-phase-display">REST</span>
+          <span class="stat-lbl">Phase</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Calibrating overlay -->
+  <div class="calibrating-overlay" id="cal-overlay">
+    <div class="cal-spinner"></div>
+    <div class="cal-text">Calibrating</div>
+    <div class="cal-sub">Stand still in frame with your full body visible</div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="cam-progress">
+    <div class="cam-progress-fill" id="progress-fill"></div>
+  </div>
+
+  <div id="cam-error" class="error-msg">Cannot connect to camera server. Make sure rep_counter.py is running.</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN 4 — SUMMARY
+════════════════════════════════════════════════════ -->
+<div id="screen-summary" class="screen">
+  <div class="topbar">
+    <div class="logo">TIPLO <span>PHYSIO</span></div>
+  </div>
+  <div class="summary-hero">
+    <span class="summary-emoji">💪</span>
+    <span class="summary-total" id="summary-total">0</span>
+    <div class="summary-total-label">Total Reps This Session</div>
+  </div>
+
+  <div class="summary-breakdown" id="summary-breakdown">
+    <!-- injected by JS -->
+  </div>
+
+  <div class="summary-footer">
+    <button class="btn btn-primary" onclick="goTo('home'); resetSession()">
+      New Session
+    </button>
+    <button class="btn btn-ghost" onclick="goTo('home')">
+      Back to Exercises
+    </button>
+  </div>
+</div>
+
+
+<script>
+// ── Exercise metadata ─────────────────────────────────────────────────────────
+const EXERCISES = {
+  auto: {
+    name: 'Auto-Detect',
+    color: '#00E5CC',
+    icon: '🎯',
+    steps: [
+      { text: 'Stand <strong>2–3 metres</strong> from the camera with your full body in frame' },
+      { text: 'The camera will <strong>automatically recognise</strong> which exercise you begin' },
+      { text: 'For floor exercises, ensure the camera can see your entire body from the side' },
+      { text: 'Begin your exercise — the label will lock in after <strong>~1 second</strong>' },
+    ],
+    metrics: [
+      { val: '5', lbl: 'Exercises' },
+      { val: 'AUTO', lbl: 'Mode' },
+      { val: '0.7s', lbl: 'Lock Time' },
+    ],
+    figure: 'auto',
+  },
+  squat: {
+    name: 'Squat',
+    color: '#00C8FF',
+    icon: '⬇️',
+    steps: [
+      { text: 'Stand <strong>feet shoulder-width apart</strong>, toes slightly out' },
+      { text: 'Lower hips until knees reach <strong>~130° or below</strong>, keeping chest up' },
+      { text: 'Both knees should track over toes — <strong>symmetric bend</strong>' },
+      { text: 'Push through heels to stand tall — full extension before next rep' },
+    ],
+    metrics: [
+      { val: '130°', lbl: 'Target Angle' },
+      { val: 'SYM', lbl: 'Both Knees' },
+      { val: '0.2s', lbl: 'Hold' },
+    ],
+    figure: 'squat',
+  },
+  arm_raise: {
+    name: 'Arm Raise',
+    color: '#B450FF',
+    icon: '🙌',
+    steps: [
+      { text: 'Stand upright, arms relaxed by your sides' },
+      { text: 'Raise one or <strong>both arms above shoulder height</strong> with control' },
+      { text: 'Keep your core engaged — avoid leaning back as arms go up' },
+      { text: 'Lower slowly back to your sides to complete the rep' },
+    ],
+    metrics: [
+      { val: '↑SH', lbl: 'Wrist Above' },
+      { val: 'L/R', lbl: 'Either Side' },
+      { val: '0.2s', lbl: 'Hold' },
+    ],
+    figure: 'arm_raise',
+  },
+  bird_dog: {
+    name: 'Bird Dog',
+    color: '#00E5CC',
+    icon: '🐦',
+    steps: [
+      { text: 'Start on <strong>hands and knees</strong> — hands under shoulders, knees under hips' },
+      { text: 'Engage core, then extend <strong>right arm forward + left leg back</strong> simultaneously' },
+      { text: 'Keep hips level — do not rotate or let the hip sag' },
+      { text: 'Return to start, then repeat on the <strong>opposite side</strong>' },
+    ],
+    metrics: [
+      { val: 'OPP', lbl: 'Limbs' },
+      { val: '↔', lbl: 'Extend' },
+      { val: '0.3s', lbl: 'Hold' },
+    ],
+    figure: 'bird_dog',
+  },
+  deep_lunge: {
+    name: 'Deep Lunge',
+    color: '#FF8C42',
+    icon: '🦵',
+    steps: [
+      { text: 'Stand tall, then <strong>step one foot forward</strong> into a long stride' },
+      { text: 'Lower until front knee reaches <strong>~90° (115° threshold)</strong>' },
+      { text: 'Back knee hovers just above floor — hips square, not twisted' },
+      { text: 'Push through the front heel to return, then alternate legs' },
+    ],
+    metrics: [
+      { val: '115°', lbl: 'Target' },
+      { val: 'ASYM', lbl: 'One Knee' },
+      { val: '0.2s', lbl: 'Hold' },
+    ],
+    figure: 'deep_lunge',
+  },
+  back_extension: {
+    name: 'Back Extension',
+    color: '#8CDC00',
+    icon: '🐍',
+    steps: [
+      { text: 'Lie <strong>face down</strong> on the floor, arms resting under forehead' },
+      { text: 'Slowly lift your chest off the floor using <strong>back muscles only</strong>' },
+      { text: 'Keep legs on the floor — do not push with hands (cobra variation)' },
+      { text: 'Hold briefly, then lower slowly — controlled movement throughout' },
+    ],
+    metrics: [
+      { val: 'PRONE', lbl: 'Position' },
+      { val: '0.10', lbl: 'Lift Thresh' },
+      { val: '0.3s', lbl: 'Hold' },
+    ],
+    figure: 'back_extension',
+  },
+};
+
+// ── SVG Figures ───────────────────────────────────────────────────────────────
+const FIGURES = {
+  squat: (color) => `
+    <svg class="figure-svg" viewBox="0 0 180 200">
+      <!-- Ghost (rest position) -->
+      <circle cx="90" cy="35" r="14" fill="${color}" opacity="0.15"/>
+      <line x1="90" y1="49" x2="90" y2="115" stroke="${color}" stroke-width="3" opacity="0.1"/>
+      <!-- Animated body -->
+      <g class="squat-torso">
+        <circle cx="90" cy="35" r="14" fill="${color}"/>
+        <line x1="90" y1="49" x2="90" y2="115" stroke="${color}" stroke-width="4" stroke-linecap="round"/>
+        <line x1="90" y1="65" x2="60" y2="95" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="90" y1="65" x2="120" y2="95" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+      </g>
+      <g class="squat-leg-l">
+        <line x1="72" y1="115" x2="55" y2="150" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="55" y1="150" x2="40" y2="175" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g class="squat-leg-r">
+        <line x1="108" y1="115" x2="125" y2="150" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="125" y1="150" x2="140" y2="175" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+      </g>
+    </svg>`,
+
+  arm_raise: (color) => `
+    <svg class="figure-svg" viewBox="0 0 180 200">
+      <circle cx="90" cy="40" r="14" fill="${color}"/>
+      <line x1="90" y1="54" x2="90" y2="125" stroke="${color}" stroke-width="4" stroke-linecap="round"/>
+      <g class="arm-l">
+        <line x1="75" y1="78" x2="50" y2="105" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="50" y1="105" x2="34" y2="122" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g class="arm-r">
+        <line x1="105" y1="78" x2="130" y2="105" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="130" y1="105" x2="146" y2="122" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <line x1="78" y1="125" x2="65" y2="165" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+      <line x1="65" y1="165" x2="58" y2="185" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+      <line x1="102" y1="125" x2="115" y2="165" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+      <line x1="115" y1="165" x2="122" y2="185" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+    </svg>`,
+
+  bird_dog: (color) => `
+    <svg class="figure-svg" viewBox="0 0 180 200">
+      <!-- Torso horizontal -->
+      <circle cx="90" cy="90" r="12" fill="${color}"/>
+      <line x1="78" y1="90" x2="30" y2="90" stroke="${color}" stroke-width="4" stroke-linecap="round"/>
+      <line x1="102" y1="90" x2="150" y2="90" stroke="${color}" stroke-width="4" stroke-linecap="round"/>
+      <!-- Support arm/leg down -->
+      <line x1="50" y1="90" x2="50" y2="125" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+      <line x1="130" y1="90" x2="130" y2="125" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- Extended arm -->
+      <g class="bird-arm-ext">
+        <line x1="30" y1="90" x2="6" y2="90" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+      </g>
+      <!-- Extended leg -->
+      <g class="bird-leg-ext">
+        <line x1="150" y1="90" x2="174" y2="90" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+      </g>
+    </svg>`,
+
+  deep_lunge: (color) => `
+    <svg class="figure-svg" viewBox="0 0 180 200">
+      <g class="lunge-body">
+        <circle cx="90" cy="40" r="14" fill="${color}"/>
+        <line x1="90" y1="54" x2="90" y2="110" stroke="${color}" stroke-width="4" stroke-linecap="round"/>
+        <line x1="90" y1="75" x2="68" y2="100" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="90" y1="75" x2="112" y2="100" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- Front leg bent -->
+        <line x1="80" y1="110" x2="55" y2="148" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="55" y1="148" x2="45" y2="175" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+        <!-- Back leg -->
+        <line x1="100" y1="110" x2="130" y2="140" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="130" y1="140" x2="145" y2="175" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+      </g>
+    </svg>`,
+
+  back_extension: (color) => `
+    <svg class="figure-svg" viewBox="0 0 180 200">
+      <!-- Lower body flat -->
+      <line x1="90" y1="115" x2="160" y2="115" stroke="${color}" stroke-width="4" stroke-linecap="round"/>
+      <line x1="140" y1="115" x2="160" y2="130" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+      <line x1="120" y1="115" x2="140" y2="130" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- Upper body lifts -->
+      <g class="back-upper">
+        <circle cx="40" cy="95" r="12" fill="${color}"/>
+        <line x1="52" y1="100" x2="90" y2="115" stroke="${color}" stroke-width="4" stroke-linecap="round"/>
+        <line x1="60" y1="105" x2="48" y2="128" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="75" y1="108" x2="65" y2="130" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+      </g>
+    </svg>`,
+
+  auto: (color) => `
+    <svg class="figure-svg" viewBox="0 0 180 200">
+      <circle cx="90" cy="40" r="14" fill="${color}" opacity="0.8"/>
+      <line x1="90" y1="54" x2="90" y2="120" stroke="${color}" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+      <line x1="90" y1="75" x2="65" y2="100" stroke="${color}" stroke-width="3.5" stroke-linecap="round" opacity="0.8"/>
+      <line x1="90" y1="75" x2="115" y2="100" stroke="${color}" stroke-width="3.5" stroke-linecap="round" opacity="0.8"/>
+      <line x1="80" y1="120" x2="65" y2="165" stroke="${color}" stroke-width="3.5" stroke-linecap="round" opacity="0.8"/>
+      <line x1="100" y1="120" x2="115" y2="165" stroke="${color}" stroke-width="3.5" stroke-linecap="round" opacity="0.8"/>
+      <!-- Scanning arc -->
+      <circle cx="90" cy="40" r="22" stroke="${color}" stroke-width="1.5" fill="none" opacity="0.3" stroke-dasharray="4 4">
+        <animateTransform attributeName="transform" type="rotate" from="0 90 40" to="360 90 40" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <text x="90" y="190" text-anchor="middle" fill="${color}" font-size="11" font-family="monospace" opacity="0.6">AUTO DETECT</text>
+    </svg>`,
+};
+
+// ── State ──────────────────────────────────────────────────────────────────────
+let currentExercise = 'auto';
+let pollInterval = null;
+let lastReps = 0;
+let lastExerciseReps = {};
+let sessionData = {};
+let calibrated = false;
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function goTo(screenId) {
+  document.querySelectorAll('.screen').forEach(s => {
+    if (s.classList.contains('active')) {
+      s.classList.remove('active');
+      s.classList.add('exit');
+      setTimeout(() => s.classList.remove('exit'), 350);
+    }
+  });
+  setTimeout(() => {
+    const next = document.getElementById('screen-' + screenId);
+    if (next) next.classList.add('active');
+  }, 50);
+}
+
+// ── Exercise Selection ────────────────────────────────────────────────────────
+function selectExercise(key) {
+  currentExercise = key;
+  const ex = EXERCISES[key];
+
+  // Update guidance screen
+  document.getElementById('guidance-title').textContent = ex.name;
+  document.getElementById('guidance-title').style.color = ex.color;
+  document.querySelector('#screen-guidance .topbar').style.borderBottomColor = ex.color + '33';
+
+  // Animation stage
+  const stage = document.getElementById('anim-stage');
+  stage.style.setProperty('--card-color', ex.color);
+  stage.querySelector('::after') // update floor line color via CSS var
+  stage.innerHTML = (FIGURES[ex.figure] || FIGURES.auto)(ex.color);
+
+  // Metric chips
+  document.getElementById('metric-row').innerHTML = ex.metrics.map(m => `
+    <div class="metric-chip" style="border-color: ${ex.color}22">
+      <span class="val" style="color:${ex.color}">${m.val}</span>
+      <span class="lbl">${m.lbl}</span>
+    </div>
+  `).join('');
+
+  // Steps
+  document.getElementById('guidance-steps').innerHTML = ex.steps.map((s, i) => `
+    <div class="step">
+      <div class="step-num" style="background:${ex.color}; color:#060A0F">${i+1}</div>
+      <div class="step-text">${s.text}</div>
+    </div>
+  `).join('');
+
+  // Start button color
+  document.getElementById('start-btn').style.background = ex.color;
+
+  goTo('guidance');
+}
+
+// ── Camera ────────────────────────────────────────────────────────────────────
+function startCamera() {
+  calibrated = false;
+  lastReps = 0;
+  lastExerciseReps = {};
+  sessionData = {};
+
+  const ex = EXERCISES[currentExercise];
+
+  // Set exercise accent color in camera screen
+  document.documentElement.style.setProperty('--teal', ex.color);
+  document.getElementById('cam-exercise-name').textContent = ex.name;
+
+  // Start MJPEG feed
+  const feed = document.getElementById('camera-feed');
+  const target = currentExercise === 'auto' ? '' : currentExercise;
+  feed.src = `/video?exercise=${target}&t=${Date.now()}`;
+  feed.onerror = () => {
+    document.getElementById('cam-error').style.display = 'block';
+  };
+
+  // Show calibrating overlay
+  document.getElementById('cal-overlay').classList.remove('hidden');
+
+  // Reset UI
+  document.getElementById('rep-number').textContent = '0';
+  document.getElementById('total-reps').textContent = '0';
+  document.getElementById('rep-exercise-label').textContent = '—';
+  document.getElementById('cam-status').textContent = 'Calibrating...';
+  document.getElementById('cam-phase-display').textContent = 'REST';
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('cam-error').style.display = 'none';
+
+  goTo('camera');
+  startPolling();
+}
+
+function startPolling() {
+  if (pollInterval) clearInterval(pollInterval);
+  pollInterval = setInterval(pollState, 400);
+}
+
+async function pollState() {
+  try {
+    const r = await fetch('/state');
+    if (!r.ok) return;
+    const d = await r.json();
+
+    // Hide calibrating overlay once calibrated
+    if (d.calibrated && !calibrated) {
+      calibrated = true;
+      document.getElementById('cal-overlay').classList.add('hidden');
+    }
+
+    // Update exercise name
+    if (d.exercise && d.exercise !== 'Detecting...') {
+      document.getElementById('cam-exercise-name').textContent = d.exercise;
+    }
+
+    // Update status
+    document.getElementById('cam-status').textContent = d.status || '';
+
+    // Phase
+    const phase = d.phase || 'rest';
+    const phaseEl = document.getElementById('cam-phase-display');
+    phaseEl.textContent = phase.toUpperCase();
+    phaseEl.style.color = phase === 'active' ? 'var(--teal)' : '';
+
+    const overlay = document.getElementById('cam-overlay');
+    if (phase === 'active') {
+      overlay.classList.add('cam-phase-active');
+    } else {
+      overlay.classList.remove('cam-phase-active');
+    }
+
+    // Progress bar
+    document.getElementById('progress-fill').style.width =
+      `${(d.progress || 0) * 100}%`;
+
+    // Reps
+    const totalReps = d.reps || 0;
+    document.getElementById('total-reps').textContent = totalReps;
+
+    const exReps = d.exercise_reps || {};
+    sessionData = exReps;
+    const currentEx = d.exercise || currentExercise;
+    const exCount = exReps[currentEx] || 0;
+
+    if (exCount !== (lastExerciseReps[currentEx] || 0)) {
+      // Rep counted!
+      triggerRepFlash();
+      document.getElementById('rep-number').classList.remove('bump');
+      void document.getElementById('rep-number').offsetWidth;
+      document.getElementById('rep-number').classList.add('bump');
+    }
+
+    document.getElementById('rep-number').textContent = exCount;
+    document.getElementById('rep-exercise-label').textContent =
+      currentEx !== 'Detecting...' ? currentEx : '—';
+    document.getElementById('rep-label').textContent =
+      currentEx !== 'Detecting...' ? currentEx.split(' ')[0].toUpperCase() : 'REPS';
+
+    lastReps = totalReps;
+    lastExerciseReps = { ...exReps };
+
+  } catch (e) {
+    // Server not responding — don't crash
+  }
+}
+
+function triggerRepFlash() {
+  const el = document.getElementById('rep-flash');
+  el.classList.remove('flash');
+  void el.offsetWidth;
+  el.classList.add('flash');
+}
+
+// ── End Session ───────────────────────────────────────────────────────────────
+function endSession() {
+  clearInterval(pollInterval);
+
+  // Stop video feed
+  const feed = document.getElementById('camera-feed');
+  feed.src = '';
+
+  // Reset teal to default
+  document.documentElement.style.setProperty('--teal', '#00E5CC');
+
+  // Build summary
+  document.getElementById('summary-total').textContent = lastReps;
+
+  const breakdown = document.getElementById('summary-breakdown');
+  const entries = Object.entries(sessionData);
+
+  if (entries.length === 0) {
+    breakdown.innerHTML = `<div style="text-align:center; color:var(--grey); padding:24px; font-size:14px;">No reps recorded this session.</div>`;
+  } else {
+    breakdown.innerHTML = entries.map(([exName, count]) => {
+      const meta = Object.values(EXERCISES).find(e => e.name === exName) || {};
+      return `
+        <div class="summary-row">
+          <div class="icon">${meta.icon || '💪'}</div>
+          <div class="name">${exName}</div>
+          <div class="count">${count}<span>reps</span></div>
+        </div>`;
+    }).join('');
+  }
+
+  goTo('summary');
+}
+
+async function resetSession() {
+  try { await fetch('/reset'); } catch(e) {}
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+// Ensure home screen is active
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('screen-home').classList.add('active');
+});
+</script>
+</body>
+</html>
