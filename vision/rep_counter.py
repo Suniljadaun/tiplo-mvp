@@ -413,6 +413,10 @@ landmarker = mp_vision.PoseLandmarker.create_from_options(options)
 cap = cv2.VideoCapture(0)
 app = Flask(__name__)
 
+# Silence per-request logs — only show real errors
+import logging
+logging.getLogger("werkzeug").setLevel(logging.ERROR)
+
 
 # ── Frame generator ───────────────────────────────────────────────────────────
 def generate_frames():
