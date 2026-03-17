@@ -21,7 +21,7 @@ from datetime import datetime
 from flask import Flask, Response, request, jsonify
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from exercise_classifier import classify_exercise
+from exercise_classifier import classify_exercise, reset_hysteresis
 from gamification import GamificationEngine, aggregate_performance
 
 # ── Model ─────────────────────────────────────────────────────────────────────
@@ -89,7 +89,7 @@ state = {
     "session_start":      time.time(),
 }
 
-EXERCISE_LOCK_FRAMES = 20
+EXERCISE_LOCK_FRAMES = 20   # faster lock so reps can start in auto mode
 
 def cfg(key):
     return EXERCISE_CONFIG.get(state["exercise"], EXERCISE_CONFIG["Detecting..."])[key]
@@ -227,7 +227,11 @@ def draw_hud(canvas, reps, phase, status, exercise, debug_text=""):
 def update_exercise_lock(detected_ex):
     if detected_ex in (None, "Detecting..."):
         return
+    # Never switch during active phase or cooldown
     if state["phase"] == "active":
+        return
+    import time as _time
+    if (_time.time() - state["last_rep_time"]) < cfg("cooldown_s"):
         return
     if detected_ex == state["exercise"]:
         state["candidate_ex"]     = None
@@ -267,6 +271,10 @@ def update_state(raw_phase):
         state["lost_frames"] = 0
     else:
         state["lost_frames"] += 1
+        # Reset exercise candidate immediately when person is lost
+        # Prevents auto-detect switching exercise while user repositions
+        state["candidate_ex"]     = None
+        state["candidate_frames"] = 0
         if state["lost_frames"] > cfg("lost_grace"):
             state["active_frames"]     = 0
             state["rest_frames"]       = 0
@@ -275,13 +283,13 @@ def update_state(raw_phase):
             state["seen_initial_rest"] = False
             state["phase"]             = "rest"
             state["active_peak"]       = {}
-            state["status"]            = "Step into frame — full body needed"
+            state["status"]            = "Step back — show full body in frame"
         return
 
     # CALIBRATING
     if not state["seen_initial_rest"]:
         needed = cfg("rest_needed")
-        state["status"] = f"Hold still to calibrate... ({state['rest_frames']}/{needed})"
+        state["status"] = f"Stand still to calibrate... ({state['rest_frames']}/{needed}) — full body in frame"
         if state["rest_frames"] >= needed:
             state["seen_initial_rest"] = True
             state["rest_frames"]       = 0
@@ -417,13 +425,16 @@ app = Flask(__name__)
 import logging
 logging.getLogger("werkzeug").setLevel(logging.ERROR)
 
+import threading
+latest_frame = None
 
-# ── Frame generator ───────────────────────────────────────────────────────────
-def generate_frames():
+def camera_processing_loop():
+    global latest_frame
     while True:
         ret, frame = cap.read()
         if not ret:
-            break
+            time.sleep(0.01)
+            continue
 
         frame = cv2.flip(frame, 1)
         h, w  = frame.shape[:2]
@@ -456,6 +467,15 @@ def generate_frames():
                 state["exercise"] = detected_ex
             else:
                 update_exercise_lock(detected_ex)
+                # In auto-detect, do not feed phase transitions until the
+                # detected exercise matches the locked exercise. This prevents
+                # "label says X, counting from Y" behavior.
+                if state["exercise"] == "Detecting..." or detected_ex != state["exercise"]:
+                    # Keep the state machine in a safe rest-like mode so
+                    # calibration can continue, but avoid closing any active rep
+                    # from a mismatched exercise.
+                    state["reached_active"] = False
+                    raw_phase = "rest"
 
             if state["candidate_ex"] and state["candidate_ex"] != state["exercise"]:
                 pct = int(state["candidate_frames"] / EXERCISE_LOCK_FRAMES * 100)
@@ -464,10 +484,7 @@ def generate_frames():
             # Track form metrics during active phase
             track_form_metrics(cl, landmarks)
 
-            print(f"{state['exercise']:18} | raw:{str(raw_phase):14} | "
-                  f"confirmed:{state['phase']:7} | reps:{state['reps']} | "
-                  f"a:{state['active_frames']} r:{state['rest_frames']}",
-                  end="\r")
+            # (Optional debug terminal output removed here to prevent console spam)
         else:
             landmarks  = state["last_landmarks"]
             seg_mask   = None
@@ -482,7 +499,16 @@ def generate_frames():
 
         canvas = cv2.resize(canvas, (960, 720))
         _, buf = cv2.imencode(".jpg", canvas, [cv2.IMWRITE_JPEG_QUALITY, 88])
-        yield (b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + buf.tobytes() + b"\r\n")
+        latest_frame = b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + buf.tobytes() + b"\r\n"
+
+threading.Thread(target=camera_processing_loop, daemon=True).start()
+
+# ── Frame generator ───────────────────────────────────────────────────────────
+def generate_frames():
+    while True:
+        if latest_frame is not None:
+            yield latest_frame
+        time.sleep(0.03)
 
 
 # ── Routes ────────────────────────────────────────────────────────────────────
@@ -510,15 +536,23 @@ def index():
 @app.route("/video")
 def video():
     ex_param = request.args.get("exercise", "").strip()
-    if ex_param and ex_param != TARGET:
-        key_map = {
-            "squat": "squat", "arm_raise": "arm_raise",
-            "bird_dog": "bird_dog", "deep_lunge": "deep_lunge",
-            "back_extension": "back_extension", "": None,
-        }
-        global ACTIVE_TARGET
-        ACTIVE_TARGET = key_map.get(ex_param, None)
-        _reset_state()
+    
+    key_map = {
+        "squat": "squat", "arm_raise": "arm_raise",
+        "bird_dog": "bird_dog", "deep_lunge": "deep_lunge",
+        "back_extension": "back_extension", "": None,
+    }
+    
+    global ACTIVE_TARGET
+    # If the UI specifically asks for a different mode, we take it.
+    new_target = key_map.get(ex_param, None)
+    
+    # Update active target and force a clean reset of hysteresis/state on new stream.
+    if ACTIVE_TARGET != new_target:
+        ACTIVE_TARGET = new_target
+    
+    # Always reset state on new video connection to ensure clean start
+    _reset_state()
     return Response(generate_frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
@@ -620,6 +654,9 @@ def _reset_state():
     state["last_rep_time"]    = 0.0
     state["active_peak"]      = {}
     state["status"]           = "Get into position..."
+    # Reset hysteresis flags and angle smoothers in the classifier
+    # Without this, _squat_active=True from session 1 blocks session 2
+    reset_hysteresis()
 
 
 if __name__ == "__main__":
